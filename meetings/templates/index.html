@@ -36,11 +36,20 @@
 <div class="container">
 
 <h1>Busy times</h1>
+{% if g.busyTimes is defined %}
+  {% for time in g.busyTimes %}
+    <p>Start time: {{time['start']}}</p>
+    <p>End time: {{time['end']}}</p>
+    <p>Event: {{time['event']}}</p>
+    <p>Calendar: {{time['calendar']}}</p>
+  {% endfor %}
+{% endif %}
+
 
 <!--
-  -- If there are any warnings or other messages from a prior action,
-  -- they appear above the rest of the content, just until the next 
-  -- action.
+  - If there are any warnings or other messages from a prior action,
+  - they appear above the rest of the content, just until the next
+  - action.
   -->
 
 {% with messages = get_flashed_messages() %}
@@ -68,7 +77,7 @@
     {    ranges: {
            'Today': [moment(), moment()],
            'Tomorrow':[moment().add(1, 'days'),
-                       moment().add(1, 'days')], 
+                       moment().add(1, 'days')],
            'This week':[moment(), moment().endOf('week')],
            'Next week':[moment().add(7, 'days').startOf('week'),
                         moment().add(7, 'days').endOf('week')],
@@ -86,21 +95,45 @@
     Show the calendar list (if we have it).  This will need to be turned into
     a form from which calendars can be picked. Up to three entries are
     shown in each row (but the order is across then down; I would
-    prefer down then across). 
+    prefer down then across).
     -->
-{% if g.calendars is defined  %}
+<!-- {% if g.calendars is defined  %}
   <div class="row">
   {% for cal in g.calendars if cal.selected %}
           <div class="col-md-4">
 	   {{ cal.summary }}
+     <div class="select_button">
+       <form method="POST" action="/_select" id="select" name="select">
+          <input type="hidden" value="{{cal.id}}" name="selectToken"/>
+         <label for "submit">Click to select:</label>
+         <input type="submit" name="submit" id="submit"/>
+     </form>
+     </div>
           </div>
+
          {% if loop.index is divisibleby 3 %}
           </div> <div class="row">
          {% endif %}
   {% endfor %}
   </div>
+{% endif %} -->
+
+{% if g.calendars is defined %}
+    <form method="POST" action="/_select" id="select" name="select">
+    <fieldset>
+        <legend> Choose your calendars </legend>
+    {% for cal in g.calendars if cal.selected %}
+        <div>
+            <input type="checkbox" id="calendar" name="calendar" value="{{cal['id']}}" />
+            <label for="calendar"> {{cal['summary']}} </label>
+        </div>
+    {% endfor %}
+    <div>
+        <button type="submit">Submit Calendars</button>
+    </div>
+    </fieldset>
+    </form>
 {% endif %}
-    
 
   </div>  <!-- container (for bootstrap) -->
   </body> </html>
